@@ -1,23 +1,5 @@
-import React from 'react';
-import { Global, css } from '@emotion/core'
+import React, { useState } from 'react';
 import styled from '@emotion/styled'
-
-const globalStyles = css`
-  * {
-    box-sizing: border-box;
-  }
-  html {
-    height: 100vh;
-    width: 100vw;
-  }
-  body {
-    font-family: "Inter UI", "Fakt Pro", "Roboto", "Helvetica", sans-serif;
-  }
-  .u-fullscreenStretch {
-    width: 100%;
-    height: 100%;
-  }
-`
 
 const Table = styled.table`
   border-collapse: collapse;
@@ -42,7 +24,8 @@ const HeaderCell = styled(Cell)`
 `
 
 const BodyCell = styled(Cell)`
-  background: lightblue;
+  background: ${props => props.isHighlighted ? 'blue' : 'lightblue'};
+  cursor: pointer;
 `
 
 const Row = styled.tr`
@@ -60,13 +43,28 @@ const THead = styled.thead`
   /* width: 100%; */
 `
 
-const tableRows = Array.from({length: 50}).map((val, i) => (i + 1));
+const tableRows = Array.from({length: 3000}).map((val, i) => (i + 1));
 const tableColumns = Array.from({length: 4}).map((val, i) => (i + 1));
 
-const TableTest = (props) => {
+const RowItem = props => (
+  <Row onClick={() => props.selectRow(props.row)}>
+    {tableColumns.map(c => (
+      <BodyCell key={c} isHighlighted={props.isHighlighted}>Fixed Column {c}, Row {props.row}</BodyCell>
+    ))}
+  </Row>
+)
+
+const MemoizedRow = React.memo(RowItem, (prevProps, nextProps) => {
+  if (prevProps.isHighlighted === nextProps.isHighlighted) {
+    return true;
+  }
+  return false;
+});
+
+const TableTest = props => {
+  const [activeRowIndex, selectRow] = useState(null);
   return (
     <>
-      <Global styles={globalStyles}></Global>
       <Table>
         <THead>
           <Row>
@@ -76,13 +74,11 @@ const TableTest = (props) => {
           </Row>
         </THead>
         <TBody>
-          {tableRows.map(x => (
-            <Row key={x}>
-              {tableColumns.map(c => (
-                <BodyCell key={c}>Fixed Column {c}, Row {x}</BodyCell>
-              ))}
-            </Row>
-          ))}
+          <>
+            {tableRows.map(x => (
+              <MemoizedRow key={x} row={x} isHighlighted={activeRowIndex === x} selectRow={selectRow} />
+            ))}
+          </>
         </TBody>
       </Table>
     </>
