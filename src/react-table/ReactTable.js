@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useCallback } from "react";
 import styled from "@emotion/styled";
-import { useTable, useBlockLayout } from "react-table";
+import { useTable, useBlockLayout, useSortBy } from "react-table";
 import { FixedSizeList } from "react-window";
+import memoize from 'memoize-one';
 
 import makeData from "./makeData";
 
@@ -71,6 +72,7 @@ function Table({ columns, data }) {
       data,
       defaultColumn
     },
+    useSortBy,
     useBlockLayout
   );
 
@@ -105,9 +107,9 @@ function Table({ columns, data }) {
         {headerGroups.map(headerGroup => (
           <div {...headerGroup.getHeaderGroupProps()} className="tr headerRow">
             {headerGroup.headers.map(column => (
-              <div {...column.getHeaderProps()} className="th">
+              <div {...column.getHeaderProps(column.getSortByToggleProps())} className="th">
                 {column.render("Header")}
-                <span>
+                <span style={{fontSize: '.666em'}}>
                   {column.isSorted
                     ? column.isSortedDesc
                       ? ' 🔽'
@@ -134,6 +136,11 @@ function Table({ columns, data }) {
   );
 }
 
+const randoSort = memoize((a, b) => {
+  const num = Math.random() - 0.5;
+  return num;
+})
+
 function App() {
   const columns = React.useMemo(
     () => [
@@ -147,7 +154,13 @@ function App() {
       },
       {
         Header: "Last Name",
-        accessor: "lastName"
+        accessor: "lastName",
+        sortType: randoSort,
+        // sortType: React.memo((a, b) => {
+        //   const num = Math.random() - 0.5;
+        //   console.log(num);
+        //   return num;
+        // }, [])
       },
       {
         Header: "Age",
@@ -171,7 +184,7 @@ function App() {
     []
   );
 
-  const data = React.useMemo(() => makeData(100000), []);
+  const data = React.useMemo(() => makeData(2000), []);
 
   return (
     <Styles>

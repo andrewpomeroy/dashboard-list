@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/core": "^10.0.21",
     "@emotion/styled": "^10.0.17",
+    "memoize-one": "^5.1.1",
     "namor": "^2.0.2",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
