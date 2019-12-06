@@ -1,8 +1,9 @@
-import React, { useCallback } from "react";
+import React, { useState } from "react";
 import styled from "@emotion/styled";
 import { useTable, useBlockLayout, useSortBy } from "react-table";
 import { FixedSizeList } from "react-window";
 import memoize from 'memoize-one';
+import Measure from 'react-measure'
 import getColumnWidth from './getColumnWidth';
 
 import makeData from "./makeData";
@@ -77,6 +78,7 @@ function Table({ columns, data }) {
     useBlockLayout
   );
 
+
   const RenderRow = React.useCallback(
     ({ index, style }) => {
       const row = rows[index];
@@ -143,58 +145,78 @@ const randoSort = memoize((a, b) => {
 })
 
 function App() {
+  const [tableContainerWidth, setTableContainerWidth] = useState();
 
   const data = React.useMemo(() => makeData(2000), []);
 
   const columns = React.useMemo(
-    () => [
-      {
-        Header: "Row Index",
-        accessor: (row, i) => i
-      },
-      {
-        Header: "First Name",
-        accessor: "firstName",
-        width: getColumnWidth(data, 'firstName', "First Name"),
-      },
-      {
-        Header: "Last Name",
-        accessor: "lastName",
-        width: getColumnWidth(data, 'lastName', "Last Name"),
-        // sortType: randoSort,
-      },
-      {
-        Header: "Row",
-        accessor: "age",
-        width: getColumnWidth(data, 'age', "Row"),
-        // width: 50
-        minWidth: 50
-      },
-      {
-        Header: "Visits",
-        accessor: "visits",
-        width: getColumnWidth(data, 'visits', "Visits"),
-        minWidth: 60
-        // width: 60
-      },
-      {
-        Header: "Status",
-        accessor: "status",
-        width: getColumnWidth(data, 'status', "Status"),
-      },
-      {
-        Header: "Profile Progress",
-        accessor: "progress",
-        width: getColumnWidth(data, 'progress', "Profile Progress"),
-      }
-    ],
-    []
-  );
+    () => {
+      const _columns = [
+        {
+          Header: "Row Index",
+          accessor: (row, i) => i,
+        },
+        {
+          Header: "First Name",
+          accessor: "firstName",
+        },
+        {
+          Header: "Last Name",
+          accessor: "lastName",
+          // sortType: randoSort,
+        },
+        {
+          Header: "Row",
+          accessor: "age",
+          minWidth: 50
+        },
+        {
+          Header: "Visits",
+          accessor: "visits",
+          minWidth: 60
+        },
+        {
+          Header: "Status",
+          accessor: "status",
+        },
+        {
+          Header: "Profile Progress",
+          accessor: "progress",
+        }
+      ];
 
+      const getCalculatedColumnWidth = column => getColumnWidth(data, column.accessor, column.Header);
+      const totalApportionedColumnWidth = _columns.reduce((total, x) => (total + getCalculatedColumnWidth(x)), 0);
+      const containerToColumnWidthRatio = tableContainerWidth / totalApportionedColumnWidth;
+
+      return _columns.map(col => {
+        return {
+          ...col,
+          width: getColumnWidth(data, col.accessor, col.Header) * ((containerToColumnWidthRatio > 1)
+            ? containerToColumnWidthRatio
+            : 1)
+        }
+      })
+
+    },
+    [tableContainerWidth]
+  );
+  
 
   return (
     <Styles>
-      <Table columns={columns} data={data} />
+      <Measure
+      bounds
+      onResize={contentRect => {
+        console.log("container width:", contentRect.bounds.width);
+        setTableContainerWidth(contentRect.bounds.width);
+      }}>
+        {({ measureRef }) => (
+          <div ref={measureRef}> 
+            <Table columns={columns} data={data} />
+          </div>
+        )}
+      </Measure>
     </Styles>
   );
 }
