@@ -30,6 +30,11 @@ const FullScreenLayout = styled.div`
   background: hsl(0,0%,97%);
 `;
 
+const FlexFullScreen = styled(FullScreenLayout)`
+  display: flex;
+  flex-direction: column;
+`
+
 const SplitH = styled.div`
   width: 100%;
   display: flex;
@@ -68,9 +73,9 @@ function App (props) {
   return (
     <>
       {!props.isEmbedded && <Global styles={globalStyles}></Global>}
-      <FullScreenLayout>
+      <FlexFullScreen>
         <ReactTable></ReactTable>
-      </FullScreenLayout>
+      </FlexFullScreen>
     </>
     
 

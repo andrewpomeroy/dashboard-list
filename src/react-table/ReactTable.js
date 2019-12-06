@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useReducer } from "react";
 import styled from "@emotion/styled";
 import { useTable, useBlockLayout, useSortBy } from "react-table";
 import { FixedSizeList } from "react-window";
@@ -10,8 +10,12 @@ import makeData from "./makeData";
 
 const borderWidth = 1;
 
-const Styles = styled.div`
-  padding: 1rem;
+const OuterWrapper = styled.div`
+  flex: 1;
+  width: 100%;
+  padding: 0 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
 
   * {
     box-sizing: border-box;
@@ -51,7 +55,7 @@ const Styles = styled.div`
   }
 `;
 
-function Table({ columns, data }) {
+function Table({ columns, data, height }) {
   // Use the state and functions returned from useTable to build your UI
 
   const defaultColumn = React.useMemo(
@@ -127,7 +131,7 @@ function Table({ columns, data }) {
 
       <div {...getTableBodyProps()}>
         <FixedSizeList
-          height={400}
+          height={height - 40} // Rough estimate of header height. We can calculate this eventually
           itemCount={rows.length}
           itemSize={35}
           width={totalColumnsWidth}
@@ -145,7 +149,7 @@ const randoSort = memoize((a, b) => {
 })
 
 function App() {
-  const [tableContainerWidth, setTableContainerWidth] = useState();
+  const [tableContainerBounds, setTableContainerBounds] = useState({});
 
   const data = React.useMemo(() => makeData(2000), []);
 
@@ -187,7 +191,7 @@ function App() {
 
       const getCalculatedColumnWidth = column => getColumnWidth(data, column.accessor, column.Header);
       const totalApportionedColumnWidth = _columns.reduce((total, x) => (total + getCalculatedColumnWidth(x)), 0);
-      const containerToColumnWidthRatio = tableContainerWidth / totalApportionedColumnWidth;
+      const containerToColumnWidthRatio = tableContainerBounds.width / totalApportionedColumnWidth;
 
       return _columns.map(col => {
         return {
@@ -199,25 +203,24 @@ function App() {
       })
 
     },
-    [tableContainerWidth]
+    [tableContainerBounds.width]
   );
   
 
   return (
-    <Styles>
-      <Measure
+    <Measure
       bounds
       onResize={contentRect => {
         console.log("container width:", contentRect.bounds.width);
-        setTableContainerWidth(contentRect.bounds.width);
+        console.log("container height:", contentRect.bounds.height);
+        setTableContainerBounds(contentRect.bounds);
       }}>
         {({ measureRef }) => (
-          <div ref={measureRef}> 
-            <Table columns={columns} data={data} />
-          </div>
+          <OuterWrapper ref={measureRef}>
+            <Table columns={columns} data={data} height={tableContainerBounds.height || 400} />
+          </OuterWrapper>
         )}
-      </Measure>
-    </Styles>
+    </Measure>
   );
 }
 
