@@ -1,7 +1,8 @@
 import React from 'react';
 import { Global, css } from '@emotion/core'
 import styled from '@emotion/styled'
-import TableTest from './TableTest';
+// import TableTest from './TableTest';
+import ReactTable from './react-table'
 // import ScrollSync, { ScrollSyncPane } from 'react-scroll-sync';
 
 const globalStyles = css`
@@ -68,18 +69,7 @@ function App (props) {
     <>
       {!props.isEmbedded && <Global styles={globalStyles}></Global>}
       <FullScreenLayout>
-        <SplitH>
-          <HeaderAndTableFixedWrap>
-            <Header><h1>Fixed Pre-Header Area</h1></Header>
-            <TableScrollWrap>
-              <TableTest />
-            </TableScrollWrap>
-          </HeaderAndTableFixedWrap>
-          <ScrollY>
-            <Header><h1>Scrollable Pre-Header Area</h1></Header>
-            <TableTest />
-          </ScrollY>
-        </SplitH>
+        <ReactTable></ReactTable>
       </FullScreenLayout>
     </>
     
