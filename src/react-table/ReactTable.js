@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 import { useTable, useBlockLayout, useSortBy } from "react-table";
 import { FixedSizeList } from "react-window";
 import memoize from 'memoize-one';
+import getColumnWidth from './getColumnWidth';
 
 import makeData from "./makeData";
 
@@ -142,6 +143,9 @@ const randoSort = memoize((a, b) => {
 })
 
 function App() {
+
+  const data = React.useMemo(() => makeData(2000), []);
+
   const columns = React.useMemo(
     () => [
       {
@@ -150,41 +154,43 @@ function App() {
       },
       {
         Header: "First Name",
-        accessor: "firstName"
+        accessor: "firstName",
+        width: getColumnWidth(data, 'firstName', "First Name"),
       },
       {
         Header: "Last Name",
         accessor: "lastName",
-        sortType: randoSort,
-        // sortType: React.memo((a, b) => {
-        //   const num = Math.random() - 0.5;
-        //   console.log(num);
-        //   return num;
-        // }, [])
+        width: getColumnWidth(data, 'lastName', "Last Name"),
+        // sortType: randoSort,
       },
       {
-        Header: "Age",
+        Header: "Row",
         accessor: "age",
-        width: 50
+        width: getColumnWidth(data, 'age', "Row"),
+        // width: 50
+        minWidth: 50
       },
       {
         Header: "Visits",
         accessor: "visits",
-        width: 60
+        width: getColumnWidth(data, 'visits', "Visits"),
+        minWidth: 60
+        // width: 60
       },
       {
         Header: "Status",
-        accessor: "status"
+        accessor: "status",
+        width: getColumnWidth(data, 'status', "Status"),
       },
       {
         Header: "Profile Progress",
-        accessor: "progress"
+        accessor: "progress",
+        width: getColumnWidth(data, 'progress', "Profile Progress"),
       }
     ],
     []
   );
 
-  const data = React.useMemo(() => makeData(2000), []);
 
   return (
     <Styles>
