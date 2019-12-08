@@ -69,29 +69,16 @@ function Table({ columns, data, height }) {
   .fill(true)
   .map(() => 25 + Math.round(Math.random() * 50));
 
-  const [activeItem, setActiveItem] = useState(0);
-  const listRef = useRef({})
+  const activeItem = useRef(0);
+  const listRef = useRef({});
  
-  // const getItemSize = memoize(
-  //   index => index === activeItem ? 55 : 35
-  // )
-  // const getItemSize = React.useMemo(
-    //   () => index => index === activeItem ? 55 : 35,
-    //   [index, activeItem]
-    // )
-    // console.log(getItemSize);
-    // const getItemSize = 
-
-  useEffect(() => {
-    const id = setTimeout(() => {
-      console.log(activeItem);
-      setActiveItem(activeItem + 1);
-      if (listRef.current) {
-        listRef.current.resetAfterIndex(activeItem + 1);
-      }
-    }, 500);
-    return () => clearTimeout(id);
-  }, [activeItem])
+  const toggleItem = (index) => {
+    console.log("toggling", index, activeItem);
+    activeItem.current = (index === activeItem.current ? null : index);
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0);
+    }
+  }
 
   const {
     getTableProps,
@@ -109,20 +96,10 @@ function Table({ columns, data, height }) {
     useSortBy,
     useBlockLayout
   );
-
-      
-  // const getItemSize = React.useMemo(() => {
-  //   console.log("memo", activeItem);
-  //   return memoize(index => {
-  //     console.log("inside", activeItem);
-  //     return index === activeItem ? 55 : 35
-  //   });
-  // }, [activeItem])
       
   const getItemSize = index => {
-      console.log("inside", activeItem);
-      return index === activeItem ? 55 : 35
-    };
+    return index === activeItem.current ? 60 : 35
+  };
 
   const RenderRow = React.useCallback(
     ({ index, style }) => {
@@ -137,7 +114,7 @@ function Table({ columns, data, height }) {
         >
           {row.cells.map(cell => {
             return (
-              <div {...cell.getCellProps()} className="td">
+              <div {...cell.getCellProps()} onClick={() => toggleItem(index)} className="td">
                 {cell.render("Cell")}
               </div>
             );
