@@ -1,7 +1,7 @@
-import React, { useState, useReducer } from "react";
+import React, { useState, useReducer, useEffect, useRef } from "react";
 import styled from "@emotion/styled";
 import { useTable, useBlockLayout, useSortBy } from "react-table";
-import { FixedSizeList } from "react-window";
+import { VariableSizeList as List } from "react-window";
 import memoize from 'memoize-one';
 import Measure from 'react-measure'
 import getColumnWidth from './getColumnWidth';
@@ -65,6 +65,34 @@ function Table({ columns, data, height }) {
     []
   );
 
+  const rowHeights = new Array(1000)
+  .fill(true)
+  .map(() => 25 + Math.round(Math.random() * 50));
+
+  const [activeItem, setActiveItem] = useState(0);
+  const listRef = useRef({})
+ 
+  // const getItemSize = memoize(
+  //   index => index === activeItem ? 55 : 35
+  // )
+  // const getItemSize = React.useMemo(
+    //   () => index => index === activeItem ? 55 : 35,
+    //   [index, activeItem]
+    // )
+    // console.log(getItemSize);
+    // const getItemSize = 
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      console.log(activeItem);
+      setActiveItem(activeItem + 1);
+      if (listRef.current) {
+        listRef.current.resetAfterIndex(activeItem + 1);
+      }
+    }, 500);
+    return () => clearTimeout(id);
+  }, [activeItem])
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -82,6 +110,19 @@ function Table({ columns, data, height }) {
     useBlockLayout
   );
 
+      
+  // const getItemSize = React.useMemo(() => {
+  //   console.log("memo", activeItem);
+  //   return memoize(index => {
+  //     console.log("inside", activeItem);
+  //     return index === activeItem ? 55 : 35
+  //   });
+  // }, [activeItem])
+      
+  const getItemSize = index => {
+      console.log("inside", activeItem);
+      return index === activeItem ? 55 : 35
+    };
 
   const RenderRow = React.useCallback(
     ({ index, style }) => {
@@ -130,14 +171,15 @@ function Table({ columns, data, height }) {
       </div>
 
       <div {...getTableBodyProps()}>
-        <FixedSizeList
+        <List
+          ref={listRef}
           height={height - 40} // Rough estimate of header height. We can calculate this eventually
           itemCount={rows.length}
-          itemSize={35}
+          itemSize={getItemSize}
           width={totalColumnsWidth}
         >
           {RenderRow}
-        </FixedSizeList>
+        </List>
       </div>
     </div>
   );
@@ -205,7 +247,6 @@ function App() {
     },
     [tableContainerBounds.width]
   );
-  
 
   return (
     <Measure
