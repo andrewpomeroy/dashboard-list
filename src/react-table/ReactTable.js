@@ -5,6 +5,7 @@ import { VariableSizeList as List } from "react-window";
 import memoize from 'memoize-one';
 import Measure from 'react-measure'
 import getColumnWidth from './getColumnWidth';
+import ColumnControls from './ColumnControls';
 
 import makeData from "./makeData";
 
@@ -203,13 +204,18 @@ const columnDefs = [
 
 function App() {
   const [tableContainerBounds, setTableContainerBounds] = useState({});
-  const [activeColumns, setActiveColumns] = useState(columnDefs.map(x => x.Header));
+  const [activeColumns, setActiveColumns] = useState(columnDefs.reduce((obj, column) => {
+    return {
+      ...obj,
+      [column.Header]: true
+    }
+  }, {}));
 
   const data = React.useMemo(() => makeData(2000), []);
 
   const columns = React.useMemo(
     () => {
-      const _columns = columnDefs.filter(x => activeColumns.find(y => y === x.Header));
+      const _columns = columnDefs.filter(x => activeColumns[x.Header]);
 
       const getCalculatedColumnWidth = column => getColumnWidth(data, column.accessor, column.Header);
       const totalApportionedColumnWidth = _columns.reduce((total, x) => (total + getCalculatedColumnWidth(x)), 0);
@@ -225,23 +231,26 @@ function App() {
       })
 
     },
-    [tableContainerBounds.width]
+    [tableContainerBounds.width, activeColumns]
   );
 
   return (
-    <Measure
-      bounds
-      onResize={contentRect => {
-        console.log("container width:", contentRect.bounds.width);
-        console.log("container height:", contentRect.bounds.height);
-        setTableContainerBounds(contentRect.bounds);
-      }}>
-        {({ measureRef }) => (
-          <OuterWrapper ref={measureRef}>
-            <Table columns={columns} data={data} height={tableContainerBounds.height || 400} />
-          </OuterWrapper>
-        )}
-    </Measure>
+    <>
+      <ColumnControls options={columnDefs} activeColumns={activeColumns} setActiveColumns={setActiveColumns} />
+      <Measure
+        bounds
+        onResize={contentRect => {
+          console.log("container width:", contentRect.bounds.width);
+          console.log("container height:", contentRect.bounds.height);
+          setTableContainerBounds(contentRect.bounds);
+        }}>
+          {({ measureRef }) => (
+            <OuterWrapper ref={measureRef}>
+              <Table columns={columns} data={data} height={tableContainerBounds.height || 400} />
+            </OuterWrapper>
+          )}
+      </Measure>
+    </>
   );
 }
 
