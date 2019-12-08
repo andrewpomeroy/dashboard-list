@@ -167,46 +167,49 @@ const randoSort = memoize((a, b) => {
   return num;
 })
 
+const columnDefs = [
+  {
+    Header: "Row Index",
+    accessor: (row, i) => i,
+  },
+  {
+    Header: "First Name",
+    accessor: "firstName",
+  },
+  {
+    Header: "Last Name",
+    accessor: "lastName",
+    // sortType: randoSort,
+  },
+  {
+    Header: "Row",
+    accessor: "age",
+    minWidth: 50
+  },
+  {
+    Header: "Visits",
+    accessor: "visits",
+    minWidth: 60
+  },
+  {
+    Header: "Status",
+    accessor: "status",
+  },
+  {
+    Header: "Profile Progress",
+    accessor: "progress",
+  }
+];
+
 function App() {
   const [tableContainerBounds, setTableContainerBounds] = useState({});
+  const [activeColumns, setActiveColumns] = useState(columnDefs.map(x => x.Header));
 
   const data = React.useMemo(() => makeData(2000), []);
 
   const columns = React.useMemo(
     () => {
-      const _columns = [
-        {
-          Header: "Row Index",
-          accessor: (row, i) => i,
-        },
-        {
-          Header: "First Name",
-          accessor: "firstName",
-        },
-        {
-          Header: "Last Name",
-          accessor: "lastName",
-          // sortType: randoSort,
-        },
-        {
-          Header: "Row",
-          accessor: "age",
-          minWidth: 50
-        },
-        {
-          Header: "Visits",
-          accessor: "visits",
-          minWidth: 60
-        },
-        {
-          Header: "Status",
-          accessor: "status",
-        },
-        {
-          Header: "Profile Progress",
-          accessor: "progress",
-        }
-      ];
+      const _columns = columnDefs.filter(x => activeColumns.find(y => y === x.Header));
 
       const getCalculatedColumnWidth = column => getColumnWidth(data, column.accessor, column.Header);
       const totalApportionedColumnWidth = _columns.reduce((total, x) => (total + getCalculatedColumnWidth(x)), 0);
