@@ -169,38 +169,35 @@ const randoSort = memoize((a, b) => {
   return num;
 })
 
+const assigneeSort = memoize(({values: {assignee: a}}, {values: {assignee: b}}) => {
+  return sortNullToEnd(a, b);
+});
+
+const sortNullToEnd = (a, b) => {
+  if (a == null && b == null) return 0;
+  if (a == null) return 1;
+  if (b == null) return -1;
+  return (a.toLowerCase() > b.toLowerCase() ? 1 : -1);
+}
+
 const columnDefs = [
   {
+    id: "rowIndex",
     Header: "Row Index",
     accessor: (row, i) => i,
   },
   {
-    Header: "First Name",
-    accessor: "firstName",
+    id: "assignee",
+    Header: "Assignee",
+    accessor: "assignee.fullName",
+    sortType: assigneeSort,
   },
   {
-    Header: "Last Name",
-    accessor: "lastName",
+    id: "formName",
+    Header: "Form Name",
+    accessor: "form.name",
     // sortType: randoSort,
   },
-  {
-    Header: "Row",
-    accessor: "age",
-    minWidth: 50
-  },
-  {
-    Header: "Visits",
-    accessor: "visits",
-    minWidth: 60
-  },
-  {
-    Header: "Status",
-    accessor: "status",
-  },
-  {
-    Header: "Profile Progress",
-    accessor: "progress",
-  }
 ];
 
 function App() {
@@ -212,11 +209,7 @@ function App() {
     }
   }, {}));
 
-  const formData = makeFormData({});
-  console.log(formData[1]);
-  const formDataDisplay = JSON.stringify(formData, 2);
-
-  const data = React.useMemo(() => makeData(2000), []);
+  const data = React.useMemo(() => makeFormData({}), []);
 
   const columns = React.useMemo(
     () => {
@@ -241,13 +234,11 @@ function App() {
 
   return (
     <>
-      <pre>{formDataDisplay}</pre>
+      {/* <pre>{formDataDisplay}</pre> */}
       <ColumnControls options={columnDefs} activeColumns={activeColumns} setActiveColumns={setActiveColumns} />
       <Measure
         bounds
         onResize={contentRect => {
-          console.log("container width:", contentRect.bounds.width);
-          console.log("container height:", contentRect.bounds.height);
           setTableContainerBounds(contentRect.bounds);
         }}>
           {({ measureRef }) => (

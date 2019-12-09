@@ -20,7 +20,6 @@ const ColumnControls = ({ options, activeColumns, setActiveColumns }) => {
       [option.Header]: !activeColumns[option.Header]
     })
   }
-  console.log(activeColumns);
   return (
     <Row>
       {options.map(option => {
