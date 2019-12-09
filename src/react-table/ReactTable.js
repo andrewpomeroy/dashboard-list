@@ -8,27 +8,25 @@ import dayjs from 'dayjs';
 import getColumnWidth from './getColumnWidth';
 import ColumnControls from './ColumnControls';
 import { Table as TableComponent, Row, HeaderRow, Cell, HeaderCell } from './tableComponents';
-import { Username, UnassignedUser } from './commonComponents';
+import { Username, UnassignedUser, PrimaryText } from './commonComponents';
 
 import makeData from "./makeData";
 import makeFormData from "./makeFormData";
 
-const borderWidth = 1;
 
 const OuterWrapper = styled.div`
   flex: 1;
   width: 100%;
-  padding: 0 1rem;
-  margin: 1rem 0;
+  /* padding: 0 1rem; */
+  /* margin: 1rem 0; */
+  overflow-x: auto;
   * {
     box-sizing: border-box;
   }
 `;
 const InnerWrapper = styled.div`
-  width: calc(100% - ${borderWidth * 2}px); 
-  height: calc(100% - ${borderWidth * 2}px);
-  overflow-x: auto;
-  border: ${borderWidth}px solid;
+  width: 100%;
+  height: 100%;
 `
 
 function Table({ columns, data, height }) {
@@ -74,7 +72,7 @@ function Table({ columns, data, height }) {
   );
       
   const getItemSize = index => {
-    return index === activeItem.current ? 60 : 35
+    return index === activeItem.current ? 100 : 46
   };
 
   const RenderRow = React.useCallback(
@@ -86,6 +84,7 @@ function Table({ columns, data, height }) {
           {...row.getRowProps({
             style
           })}
+          isOdd={index % 2}
         >
           {row.cells.map(cell => {
             return (
@@ -178,17 +177,10 @@ const columnDefs = [
     shownByDefault: false,
   },
   {
-    id: "assignee",
-    Header: "Assignee",
-    accessor: "assignee.fullName",
-    Cell: props => props.row.values.assignee ? <Username>{props.row.values.assignee}</Username> : <UnassignedUser>Unassigned</UnassignedUser>,
-    sortType: assigneeSort,
-    shownByDefault: true,
-  },
-  {
     id: "formName",
     Header: "Form Name",
     accessor: "form.name",
+    Cell: props => <PrimaryText>{props.row.values.formName}</PrimaryText>,
     shownByDefault: true,
     maxCharLength: 80,
   },
@@ -198,7 +190,15 @@ const columnDefs = [
     accessor: "submittedOn",
     Cell: SubmittedDateCell,
     shownByDefault: true,
-  }
+  },
+  {
+    id: "assignee",
+    Header: "Assignee",
+    accessor: "assignee.fullName",
+    Cell: props => props.row.values.assignee ? <Username>{props.row.values.assignee}</Username> : <UnassignedUser>Unassigned</UnassignedUser>,
+    sortType: assigneeSort,
+    shownByDefault: true,
+  },
 ];
 
 function App() {
