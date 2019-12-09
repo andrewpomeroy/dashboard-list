@@ -3,9 +3,11 @@ import styled from "@emotion/styled";
 import { useTable, useBlockLayout, useSortBy } from "react-table";
 import { VariableSizeList as List } from "react-window";
 import memoize from 'memoize-one';
-import Measure from 'react-measure'
+import Measure from 'react-measure';
+import dayjs from 'dayjs';
 import getColumnWidth from './getColumnWidth';
 import ColumnControls from './ColumnControls';
+import { Username, UnassignedUser } from './commonComponents';
 
 import makeData from "./makeData";
 import makeFormData from "./makeFormData";
@@ -180,6 +182,19 @@ const sortNullToEnd = (a, b) => {
   return (a.toLowerCase() > b.toLowerCase() ? 1 : -1);
 }
 
+const SubmittedDateCell = props => {
+  return React.useMemo(() => {
+    const obj = dayjs(props.row.values.submittedOn);
+    const daysAgo = dayjs().diff(obj, 'day');
+    return (
+      <>
+        <span>{props.row.values.submittedOn ? obj.format('MM/DD/YYYY') : null}</span>
+        <>{daysAgo ? <span> ({daysAgo} days ago)</span> : <span> (today)</span>}</>
+      </>
+    )
+  }, [props.row.values.submittedOn])
+}
+
 const columnDefs = [
   {
     id: "rowIndex",
@@ -190,6 +205,7 @@ const columnDefs = [
     id: "assignee",
     Header: "Assignee",
     accessor: "assignee.fullName",
+    Cell: props => props.row.values.assignee ? <Username>{props.row.values.assignee}</Username> : <UnassignedUser>Unassigned</UnassignedUser>,
     sortType: assigneeSort,
   },
   {
@@ -198,6 +214,12 @@ const columnDefs = [
     accessor: "form.name",
     // sortType: randoSort,
   },
+  {
+    id: "submittedOn",
+    Header: "Submitted On",
+    accessor: "submittedOn",
+    Cell: SubmittedDateCell
+  }
 ];
 
 function App() {
@@ -234,7 +256,6 @@ function App() {
 
   return (
     <>
-      {/* <pre>{formDataDisplay}</pre> */}
       <ColumnControls options={columnDefs} activeColumns={activeColumns} setActiveColumns={setActiveColumns} />
       <Measure
         bounds

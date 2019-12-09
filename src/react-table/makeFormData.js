@@ -79,7 +79,10 @@ const getAssignee = users => {
 }
 
 const getSubmittedDate = () => {
-  return dayjs().subtract(Math.floor(Math.random() * 7), 'day');
+  const date = dayjs().subtract(Math.floor(Math.random() * 7), 'day').toISOString();
+  // console.log(date);
+  // console.log(dayjs(date).format('MM/DD/YYYY hh:mmA'));
+  return date;
 }
 
 export const makeUsers = count => range(count).map(newPerson)
