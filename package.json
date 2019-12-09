@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/core": "^10.0.21",
     "@emotion/styled": "^10.0.17",
+    "babel-plugin-emotion": "^10.0.23",
     "dayjs": "^1.8.17",
     "faker": "^4.1.0",
     "lodash-es": "^4.17.15",
@@ -38,5 +39,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.7.6"
   }
 }

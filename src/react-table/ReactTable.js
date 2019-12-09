@@ -7,6 +7,7 @@ import Measure from 'react-measure';
 import dayjs from 'dayjs';
 import getColumnWidth from './getColumnWidth';
 import ColumnControls from './ColumnControls';
+import { Table as TableComponent, Row, HeaderRow, Cell, HeaderCell } from './tableComponents';
 import { Username, UnassignedUser } from './commonComponents';
 
 import makeData from "./makeData";
@@ -23,39 +24,6 @@ const OuterWrapper = styled.div`
 
   * {
     box-sizing: border-box;
-  }
-
-  .table {
-    display: inline-block;
-    border-spacing: 0;
-    border: ${borderWidth}px solid black;
-
-    .headerRow {
-      overflow-y: scroll;
-    }
-
-    .tr {
-      :last-child {
-        .td {
-          border-bottom: 0;
-        }
-      }
-    }
-
-    .th,
-    .td {
-      margin: 0;
-      padding: 0.5rem;
-      border-bottom: ${borderWidth}px solid black;
-      border-right: ${borderWidth}px solid black;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-
-      :last-child {
-        border-right: 0;
-      }
-    }
   }
 `;
 
@@ -110,20 +78,19 @@ function Table({ columns, data, height }) {
       const row = rows[index];
       prepareRow(row);
       return (
-        <div
+        <Row
           {...row.getRowProps({
             style
           })}
-          className="tr"
         >
           {row.cells.map(cell => {
             return (
-              <div {...cell.getCellProps()} onClick={() => toggleItem(index)} className="td">
+              <Cell {...cell.getCellProps()} onClick={() => toggleItem(index)} className="td">
                 {cell.render("Cell")}
-              </div>
+              </Cell>
             );
           })}
-        </div>
+        </Row>
       );
     },
     [prepareRow, rows]
@@ -131,12 +98,12 @@ function Table({ columns, data, height }) {
 
   // Render the UI for your table
   return (
-    <div {...getTableProps()} className="table">
+    <TableComponent {...getTableProps()}>
       <div>
         {headerGroups.map(headerGroup => (
-          <div {...headerGroup.getHeaderGroupProps()} className="tr headerRow">
+          <HeaderRow {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map(column => (
-              <div {...column.getHeaderProps(column.getSortByToggleProps())} className="th">
+              <HeaderCell {...column.getHeaderProps(column.getSortByToggleProps())}>
                 {column.render("Header")}
                 <span style={{fontSize: '.666em'}}>
                   {column.isSorted
@@ -145,9 +112,9 @@ function Table({ columns, data, height }) {
                       : ' 🔼'
                     : ''}
                 </span>
-              </div>
+              </HeaderCell>
             ))}
-          </div>
+          </HeaderRow>
         ))}
       </div>
 
@@ -162,7 +129,7 @@ function Table({ columns, data, height }) {
           {RenderRow}
         </List>
       </div>
-    </div>
+    </TableComponent>
   );
 }
 
