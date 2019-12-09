@@ -8,6 +8,7 @@ import getColumnWidth from './getColumnWidth';
 import ColumnControls from './ColumnControls';
 
 import makeData from "./makeData";
+import makeFormData from "./makeFormData";
 
 const borderWidth = 1;
 
@@ -211,6 +212,10 @@ function App() {
     }
   }, {}));
 
+  const formData = makeFormData({});
+  console.log(formData[1]);
+  const formDataDisplay = JSON.stringify(formData, 2);
+
   const data = React.useMemo(() => makeData(2000), []);
 
   const columns = React.useMemo(
@@ -236,6 +241,7 @@ function App() {
 
   return (
     <>
+      <pre>{formDataDisplay}</pre>
       <ColumnControls options={columnDefs} activeColumns={activeColumns} setActiveColumns={setActiveColumns} />
       <Measure
         bounds

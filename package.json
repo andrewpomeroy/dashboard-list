@@ -5,6 +5,8 @@
   "dependencies": {
     "@emotion/core": "^10.0.21",
     "@emotion/styled": "^10.0.17",
+    "dayjs": "^1.8.17",
+    "faker": "^4.1.0",
     "lodash-es": "^4.17.15",
     "memoize-one": "^5.1.1",
     "namor": "^2.0.2",
