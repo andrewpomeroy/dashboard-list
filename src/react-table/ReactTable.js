@@ -1,5 +1,5 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
-import styled from "@emotion/styled";
+import styled from "@emotion/styled/macro";
 import { useTable, useBlockLayout, useSortBy } from "react-table";
 import { VariableSizeList as List } from "react-window";
 import memoize from 'memoize-one';
@@ -20,12 +20,15 @@ const OuterWrapper = styled.div`
   width: 100%;
   padding: 0 1rem;
   margin: 1rem 0;
-  overflow-x: auto;
-
   * {
     box-sizing: border-box;
   }
 `;
+const InnerWrapper = styled.div`
+  width: 100%; 
+  height: 100%;
+  overflow-x: auto;
+`
 
 function Table({ columns, data, height }) {
   // Use the state and functions returned from useTable to build your UI
@@ -124,7 +127,7 @@ function Table({ columns, data, height }) {
           height={height - 40} // Rough estimate of header height. We can calculate this eventually
           itemCount={rows.length}
           itemSize={getItemSize}
-          width={totalColumnsWidth}
+          width={totalColumnsWidth || 0}
         >
           {RenderRow}
         </List>
@@ -186,6 +189,7 @@ const columnDefs = [
     Header: "Form Name",
     accessor: "form.name",
     shownByDefault: true,
+    maxCharLength: 80,
   },
   {
     id: "submittedOn",
@@ -214,9 +218,7 @@ function App() {
 
       const getCalculatedColumnWidth = column => getColumnWidth({
         data,
-        accessor: column.accessor,
-        headerText: column.Header,
-        columnId: column.id,
+        column,
         options: columnOptions,
       });
       const columnWidths = _columns.reduce((obj, col) => ({
@@ -230,9 +232,10 @@ function App() {
         console.log(column);
         return {
           ...column,
-          width: columnWidths[column.id] * ((containerToColumnWidthRatio > 1)
-            ? containerToColumnWidthRatio
-            : 1)
+          // width: columnWidths[column.id] * ((containerToColumnWidthRatio > 1)
+          //   ? containerToColumnWidthRatio
+          //   : 1)
+          width: columnWidths[column.id] * containerToColumnWidthRatio
         }
       })
 
@@ -246,11 +249,16 @@ function App() {
       <Measure
         bounds
         onResize={contentRect => {
-          setTableContainerBounds(contentRect.bounds);
+          setTableContainerBounds({
+            ...contentRect.bounds,
+            width: contentRect.bounds.width - borderWidth * 2
+          });
         }}>
           {({ measureRef }) => (
-            <OuterWrapper ref={measureRef}>
-              <Table columns={columns} data={data} height={tableContainerBounds.height || 400} />
+            <OuterWrapper>
+              <InnerWrapper ref={measureRef}>
+                <Table columns={columns} data={data} height={tableContainerBounds.height || 400} />
+              </InnerWrapper>
             </OuterWrapper>
           )}
       </Measure>
