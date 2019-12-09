@@ -162,11 +162,16 @@ const SubmittedDateCell = props => {
   }, [props.row.values.submittedOn])
 }
 
+const columnOptions = {
+  maxWidth: 600
+}
+
 const columnDefs = [
   {
     id: "rowIndex",
     Header: "Row Index",
     accessor: (row, i) => i,
+    shownByDefault: false,
   },
   {
     id: "assignee",
@@ -174,18 +179,20 @@ const columnDefs = [
     accessor: "assignee.fullName",
     Cell: props => props.row.values.assignee ? <Username>{props.row.values.assignee}</Username> : <UnassignedUser>Unassigned</UnassignedUser>,
     sortType: assigneeSort,
+    shownByDefault: true,
   },
   {
     id: "formName",
     Header: "Form Name",
     accessor: "form.name",
-    // sortType: randoSort,
+    shownByDefault: true,
   },
   {
     id: "submittedOn",
     Header: "Submitted On",
     accessor: "submittedOn",
-    Cell: SubmittedDateCell
+    Cell: SubmittedDateCell,
+    shownByDefault: true,
   }
 ];
 
@@ -194,7 +201,7 @@ function App() {
   const [activeColumns, setActiveColumns] = useState(columnDefs.reduce((obj, column) => {
     return {
       ...obj,
-      [column.Header]: true
+      [column.id]: column.shownByDefault
     }
   }, {}));
 
@@ -202,16 +209,28 @@ function App() {
 
   const columns = React.useMemo(
     () => {
-      const _columns = columnDefs.filter(x => activeColumns[x.Header]);
+      const _columns = columnDefs.filter(x => activeColumns[x.id]);
+      console.log(_columns);
 
-      const getCalculatedColumnWidth = column => getColumnWidth(data, column.accessor, column.Header);
-      const totalApportionedColumnWidth = _columns.reduce((total, x) => (total + getCalculatedColumnWidth(x)), 0);
+      const getCalculatedColumnWidth = column => getColumnWidth({
+        data,
+        accessor: column.accessor,
+        headerText: column.Header,
+        columnId: column.id,
+        options: columnOptions,
+      });
+      const columnWidths = _columns.reduce((obj, col) => ({
+        ...obj,
+        [col.id]: getCalculatedColumnWidth(col)
+      }), {});
+      const totalApportionedColumnWidth = _columns.reduce((total, col) => (total + columnWidths[col.id]), 0);
       const containerToColumnWidthRatio = tableContainerBounds.width / totalApportionedColumnWidth;
 
-      return _columns.map(col => {
+      return _columns.map(column => {
+        console.log(column);
         return {
-          ...col,
-          width: getColumnWidth(data, col.accessor, col.Header) * ((containerToColumnWidthRatio > 1)
+          ...column,
+          width: columnWidths[column.id] * ((containerToColumnWidthRatio > 1)
             ? containerToColumnWidthRatio
             : 1)
         }

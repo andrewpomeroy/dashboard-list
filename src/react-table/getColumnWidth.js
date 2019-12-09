@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 
-const getColumnWidth = (data, accessor, headerText) => {
+const getColumnWidth = ({data, accessor, columnContents, columnId, headerText, options}) => {
+  console.log(headerText);
   const cellLength = Math.max(
     ...data.map(row => {
       let value = '';

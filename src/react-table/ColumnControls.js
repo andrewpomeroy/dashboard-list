@@ -17,15 +17,15 @@ const ColumnControls = ({ options, activeColumns, setActiveColumns }) => {
   const toggleOption = option => {
     setActiveColumns({
       ...activeColumns,
-      [option.Header]: !activeColumns[option.Header]
+      [option.id]: !activeColumns[option.id]
     })
   }
   return (
     <Row>
       {options.map(option => {
-        const isChecked = activeColumns[option.Header];
+        const isChecked = activeColumns[option.id];
         return (
-          <RowItem key={option.Header}>
+          <RowItem key={option.id}>
           <label>
             <input type="checkbox" checked={isChecked} onChange={() => toggleOption(option)} /> {option.Header}
           </label>
