@@ -6,7 +6,6 @@ const borderWidth = 1;
 export const Table = styled.div`
   display: inline-block;
   border-spacing: 0;
-  border: ${borderWidth}px solid black;
 `
 
 export const Cell = styled.div`

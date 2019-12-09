@@ -25,9 +25,10 @@ const OuterWrapper = styled.div`
   }
 `;
 const InnerWrapper = styled.div`
-  width: 100%; 
-  height: 100%;
+  width: calc(100% - ${borderWidth * 2}px); 
+  height: calc(100% - ${borderWidth * 2}px);
   overflow-x: auto;
+  border: ${borderWidth}px solid;
 `
 
 function Table({ columns, data, height }) {
@@ -251,7 +252,7 @@ function App() {
         onResize={contentRect => {
           setTableContainerBounds({
             ...contentRect.bounds,
-            width: contentRect.bounds.width - borderWidth * 2
+            width: contentRect.bounds.width
           });
         }}>
           {({ measureRef }) => (
