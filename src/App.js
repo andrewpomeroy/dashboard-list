@@ -1,9 +1,7 @@
 import React from 'react';
 import { Global, css } from '@emotion/core'
-import styled from '@emotion/styled'
-// import TableTest from './TableTest';
+import styled from '@emotion/styled/macro'
 import ReactTable from './react-table'
-// import ScrollSync, { ScrollSyncPane } from 'react-scroll-sync';
 
 const globalStyles = css`
   * {
@@ -23,8 +21,6 @@ const globalStyles = css`
 `
 
 const FullScreenLayout = styled.div`
-  /* width: 100vw;
-  height: 100vh; */
   width: 100%;
   height: 100%;
   background: hsl(0,0%,97%);
@@ -35,51 +31,14 @@ const FlexFullScreen = styled(FullScreenLayout)`
   flex-direction: column;
 `
 
-const SplitH = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  overflow: hidden;
-  padding-left: 5px;
-  padding-right: 5px;
-  > * {
-    padding-left: 5px;
-    padding-right: 5px;
-  }
-`
-
-const HeaderAndTableFixedWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-`
-
-const Header = styled.div`
-  flex: 0 0 auto;
-`
-
-const TableScrollWrap = styled.div`
-  flex: 1;
-  overflow: auto;
-`
-
-const ScrollY = styled.div`
-  overflow: auto;
-`
-
-function App (props) {
+function App () {
   return (
     <>
-      {!props.isEmbedded && <Global styles={globalStyles}></Global>}
+      <Global styles={globalStyles}></Global>
       <FlexFullScreen>
         <ReactTable></ReactTable>
       </FlexFullScreen>
     </>
-    
-
-
   );
 }
 

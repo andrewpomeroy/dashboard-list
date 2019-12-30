@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import styled from "@emotion/styled/macro";
 import { useTable, useBlockLayout, useSortBy } from "react-table";
 import { VariableSizeList as List } from "react-window";
@@ -7,30 +7,26 @@ import Measure from 'react-measure';
 import dayjs from 'dayjs';
 import getColumnWidth from './getColumnWidth';
 import ColumnControls from './ColumnControls';
-import { Table as TableComponent, Row, HeaderRow, Cell, HeaderCell } from './tableComponents';
+import { Table as TableComponent, Row, HeaderRow, Cell, HeaderCell } from './tableUI';
 import { Username, UnassignedUser, PrimaryText } from './commonComponents';
-
-import makeData from "./makeData";
-import makeFormData from "./makeFormData";
-
+// Fake, generated table data
+import makeSubmissionData from "./makeSubmissionData";
 
 const OuterWrapper = styled.div`
   flex: 1;
   width: 100%;
-  /* padding: 0 1rem; */
-  /* margin: 1rem 0; */
   overflow-x: auto;
   * {
     box-sizing: border-box;
   }
 `;
+
 const InnerWrapper = styled.div`
   width: 100%;
   height: 100%;
 `
 
 function Table({ columns, data, height }) {
-  // Use the state and functions returned from useTable to build your UI
 
   const defaultColumn = React.useMemo(
     () => ({
@@ -39,20 +35,7 @@ function Table({ columns, data, height }) {
     []
   );
 
-  const rowHeights = new Array(1000)
-  .fill(true)
-  .map(() => 25 + Math.round(Math.random() * 50));
-
-  const activeItem = useRef(0);
   const listRef = useRef({});
- 
-  const toggleItem = (index) => {
-    console.log("toggling", index, activeItem);
-    activeItem.current = (index === activeItem.current ? null : index);
-    if (listRef.current) {
-      listRef.current.resetAfterIndex(0);
-    }
-  }
 
   const {
     getTableProps,
@@ -71,8 +54,11 @@ function Table({ columns, data, height }) {
     useBlockLayout
   );
       
+  // TODO: Implement row measurement to produce dynamic heights for table entries.
+  // We'll be able to expand rows when they're clicked on, etc..
   const getItemSize = index => {
-    return index === activeItem.current ? 100 : 46
+    return 46
+    // return index === activeItem ? 100 : 46
   };
 
   const RenderRow = React.useCallback(
@@ -88,7 +74,7 @@ function Table({ columns, data, height }) {
         >
           {row.cells.map(cell => {
             return (
-              <Cell {...cell.getCellProps()} onClick={() => toggleItem(index)} className="td">
+              <Cell {...cell.getCellProps()} className="td">
                 {cell.render("Cell")}
               </Cell>
             );
@@ -99,7 +85,6 @@ function Table({ columns, data, height }) {
     [prepareRow, rows]
   );
 
-  // Render the UI for your table
   return (
     <TableComponent {...getTableProps()}>
       <div>
@@ -135,11 +120,6 @@ function Table({ columns, data, height }) {
     </TableComponent>
   );
 }
-
-const randoSort = memoize((a, b) => {
-  const num = Math.random() - 0.5;
-  return num;
-})
 
 const assigneeSort = memoize(({values: {assignee: a}}, {values: {assignee: b}}) => {
   return sortNullToEnd(a, b);
@@ -210,12 +190,11 @@ function App() {
     }
   }, {}));
 
-  const data = React.useMemo(() => makeFormData({}), []);
+  const data = React.useMemo(() => makeSubmissionData({}), []);
 
   const columns = React.useMemo(
     () => {
       const _columns = columnDefs.filter(x => activeColumns[x.id]);
-      console.log(_columns);
 
       const getCalculatedColumnWidth = column => getColumnWidth({
         data,
@@ -233,9 +212,6 @@ function App() {
         console.log(column);
         return {
           ...column,
-          // width: columnWidths[column.id] * ((containerToColumnWidthRatio > 1)
-          //   ? containerToColumnWidthRatio
-          //   : 1)
           width: columnWidths[column.id] * containerToColumnWidthRatio
         }
       })

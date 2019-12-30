@@ -1,8 +1,6 @@
 import styled from "@emotion/styled/macro";
 import colors from './colors';
 
-const borderWidth = 1;
-
 const cellPaddingV = 14;
 const cellPaddingH = 12;
 const cellPaddingHLarge = 24;
@@ -19,9 +17,6 @@ export const Cell = styled.div`
   align-items: center;
   margin: 0;
   padding: ${cellPaddingV}px ${cellPaddingH}px;
-  /* padding: 0 ${cellPaddingH}px; */
-  /* border-bottom: ${borderWidth}px solid black; */
-  /* border-right: ${borderWidth}px solid black; */
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -30,7 +25,6 @@ export const Cell = styled.div`
   }
   &:last-child {
     padding-right: ${cellPaddingHLarge}px;
-    /* border-right: 0; */
   }
 `
 export const HeaderCell = styled(Cell)`
